@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Cute Pet - You Take Care!</title>
+<style>
+body{margin:0;font-family:Arial;background:#ffd6e7;text-align:center;overflow:hidden}
+#room{height:100vh;position:relative;background:#2b2b3a;transition:0.5s}
+#room.day{background:#aee8ff}
+#pet{font-size:110px;margin-top:60px;transition:0.5s;cursor:pointer}
+#bubble{background:white;padding:12px 18px;border-radius:20px;display:inline-block;font-weight:bold;margin-top:10px;max-width:85%}
+.bar{height:14px;background:#eee;border-radius:10px;overflow:hidden;margin:5px 20px}
+.fill{height:100%;background:#ff5e8a;transition:0.5s}
+button{padding:14px 18px;border:none;border-radius:20px;font-size:16px;font-weight:bold;margin:5px;background:white;box-shadow:0 4px 0 #ddd}
+#lightBtn{position:absolute;top:15px;right:15px;font-size:30px;background:#fff3a0;border-radius:50%}
+#bathArea{display:none;background:#b3e5ff;padding:15px;border-radius:20px;margin:10px}
+#gameArea{display:none;background:white;padding:15px;border-radius:20px;margin:10px}
+.balloon{font-size:50px;cursor:pointer;display:inline-block;margin:5px}
+</style>
+</head>
+<body>
+<div id="room">
+<button id="lightBtn" onclick="toggleLight()">💡</button>
+<div id="pet">😴</div>
+<div id="bubble">Zzz... I'm sleeping... Tap the light!</div>
+<div>❤️ Health <div class="bar"><div class="fill" style="width:80%"></div></div></div>
+<div>🍗 Hunger <div class="bar"><div class="fill" id="hunger" style="width:50%;background:orange"></div></div></div>
+<div>🧼 Dirt <div class="bar"><div class="fill" id="dirty" style="width:20%;background:brown"></div></div></div>
+<div>
+<button onclick="showFeed()">🍗 FEED</button>
+<button onclick="showBath()">🛁 BATHROOM</button>
+<button onclick="showGames()">🎮 GAMES</button>
+</div>
+<div id="feedArea" style="display:none;background:white;padding:15px;border-radius:20px;margin:10px">
+<p>Tap the food to feed your Pet!</p>
+<button onclick="feed('🍖')">🍖</button>
+<button onclick="feed('🐟')">🐟</button>
+<button onclick="feed('🥕')">🥕</button>
+<button onclick="feed('🥛')">🥛</button>
+<button onclick="feed('🍎')">🍎</button>
+</div>
+<div id="bathArea">
+<p>Tap SOAP first, then WATER!</p>
+<button onclick="soap()">🧼 SOAP</button>
+<button onclick="rinse()">💦 WATER</button>
+<div id="bathPet" style="font-size:80px">🐶</div>
+<div id="bathMsg">I'm still dirty...</div>
+</div>
+<div id="gameArea">
+<p>🎈 Tap the balloons to pop them!</p>
+<div id="balloons"></div>
+<p>Score: <span id="score">0</span></p>
+<button onclick="startGame()">▶ START GAME</button>
+</div>
+</div>
+<script>
+let awake=false, dirtyVal=20, hungerVal=50, soapDone=false, score=0;
+let pet=document.getElementById('pet');
+let bubble=document.getElementById('bubble');
+let room=document.getElementById('room');
+function toggleLight(){
+  if(!awake){ awake=true; room.classList.add('day'); pet.innerText='🐶'; bubble.innerText='Good Morning! Thank you for waking me up! 😊'; setTimeout(()=>{ bubble.innerText="I'm hungry... Feed me please!"; },2000); }
+  else { awake=false; room.classList.remove('day'); pet.innerText='😴'; bubble.innerText='Zzz... Good night! See you tomorrow!'; }
+}
+function showFeed(){
+  if(!awake){ bubble.innerText='I am still sleeping... Turn on the light first!'; return; }
+  document.getElementById('feedArea').style.display='block'; document.getElementById('bathArea').style.display='none'; document.getElementById('gameArea').style.display='none'; bubble.innerText="Choose food for me, I'm hungry!";
+}
+function feed(food){
+  hungerVal=Math.max(0,hungerVal-20); document.getElementById('hunger').style.width=hungerVal+'%'; pet.innerText='😋'; bubble.innerText='Yummy! '+food+' So delicious! Thank you!'; setTimeout(()=>{ pet.innerText='🐶'; },1200);
+  dirtyVal=Math.min(100,dirtyVal+15); document.getElementById('dirty').style.width=dirtyVal+'%';
+  if(dirtyVal>70){ bubble.innerText='Eww, I am so dirty! Take me to the Bathroom!'; pet.innerText='🤢'; }
+}
+function showBath(){
+  if(!awake){ bubble.innerText='I am sleeping...'; return; }
+  document.getElementById('bathArea').style.display='block'; document.getElementById('feedArea').style.display='none'; document.getElementById('gameArea').style.display='none'; bubble.innerText='We are in the Bathroom! Wash me please!'; document.getElementById('bathPet').innerText='🐶💩';
+}
+function soap(){ soapDone=true; document.getElementById('bathPet').innerText='🐶🫧🫧🫧'; document.getElementById('bathMsg').innerText='So many bubbles! Scrub more!'; bubble.innerText='I love soap! Bubble bubble!'; }
+function rinse(){
+  if(!soapDone){ bubble.innerText='Put soap first, then water!'; return; }
+  dirtyVal=0; soapDone=false; document.getElementById('dirty').style.width='0%'; document.getElementById('bathPet').innerText='🐶✨'; document.getElementById('bathMsg').innerText='I am clean now!'; bubble.innerText='Yay! I am clean now! I smell good!'; pet.innerText='🐶✨';
+}
+function showGames(){
+  if(!awake){ bubble.innerText='I am sleeping...'; return; }
+  document.getElementById('gameArea').style.display='block'; document.getElementById('feedArea').style.display='none'; document.getElementById('bathArea').style.display='none'; bubble.innerText='Lets play! Pop the balloons!';
+}
+function startGame(){
+  score=0; document.getElementById('score').innerText=score; let box=document.getElementById('balloons'); box.innerHTML='';
+  for(let i=0;i<6;i++){ let s=document.createElement('span'); s.className='balloon'; s.innerText='🎈'; s.onclick=function(){ s.innerText='💥'; score+=10; document.getElementById('score').innerText=score; bubble.innerText='Wow! Pop! Your Score: '+score; }; box.appendChild(s); }
+}
+setInterval(()=>{ if(awake && hungerVal<100){ hungerVal+=2; document.getElementById('hunger').style.width=hungerVal+'%'; if(hungerVal>85) bubble.innerText="I'm hungry! Feed me please!"; } },3000);
+</script>
+</body>
+  </html>
